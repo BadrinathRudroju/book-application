@@ -36,4 +36,18 @@ public class BookController {
         final Book readbook = bookService.getBook(name);
         return ResponseEntity.ok(readbook);
     }
+
+    //here we need to explicitly mention the the id of the book to change it
+    // or else it will just add another book which has new id(do it through postman)
+    @PutMapping("/updatebook")
+    public ResponseEntity<Book> updateBookbyid(@RequestBody Book book){
+        Book updatedbook = bookService.updateBook(book);
+        return ResponseEntity.ok(updatedbook);
+    }
+
+    @DeleteMapping("/deletebook/{id}")
+    public ResponseEntity<Book> deleteBook(@PathVariable("id") Integer id){
+        bookService.deleteBook(id);
+        return ResponseEntity.ok().build();
+    }
 }
