@@ -25,12 +25,15 @@ public class BookController {
 
     //ResponseEntity lets us control the http response - not just the body
     //but also status code and header
+    //requestbody helps in convert a htttp request(json/xml) into java object
+    // since it cannot directly understand the json format
     @PostMapping("/addbook")
     public ResponseEntity<Book> addBook(@RequestBody Book book){
         Book savedbook = bookService.addBook(book);
         return ResponseEntity.ok(savedbook);
     }
 
+    //PathVariable is used to extract content and values from url path
     @GetMapping("/getbook/{bookname}")
     public ResponseEntity<Book> getByBookName(@PathVariable("bookname") String name){
         final Book readbook = bookService.getBook(name);
