@@ -2,7 +2,10 @@ package com.example.BookApplication.controller;
 
 import com.example.BookApplication.Entity.Book;
 import com.example.BookApplication.Service.BookService;
+import com.example.BookApplication.dto.BookRequest;
+import com.example.BookApplication.dto.BookResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,7 +20,7 @@ public class BookController {
 
     private final BookService bookService;
 
-    //autowire injects bookservice dependency injection into bookcontroller class constructor
+
     @Autowired
     public BookController(BookService bookService){
         this.bookService = bookService;
@@ -28,24 +31,20 @@ public class BookController {
     //requestbody helps in convert a htttp request(json/xml) into java object
     // since it cannot directly understand the json format
     @PostMapping("/addbook")
-    public ResponseEntity<Book> addBook(@RequestBody Book book){
-        Book savedbook = bookService.addBook(book);
-        return ResponseEntity.ok(savedbook);
+    public ResponseEntity<BookResponse> addBook(@RequestBody Book book){
+        return ResponseEntity.status(HttpStatus.CREATED).body(bookService.addBook(book));
     }
 
     //PathVariable is used to extract content and values from url path
     @GetMapping("/getbook/{bookname}")
-    public ResponseEntity<Book> getByBookName(@PathVariable("bookname") String name){
-        final Book readbook = bookService.getBook(name);
-        return ResponseEntity.ok(readbook);
+    public ResponseEntity<BookResponse> getByBookName(@PathVariable("bookname") String title){
+        return ResponseEntity.ok(bookService.getBookById(title));
     }
 
-    //here we need to explicitly mention the the id of the book to change it
-    // or else it will just add another book which has new id(do it through postman)
+
     @PutMapping("/updatebook")
-    public ResponseEntity<Book> updateBookbyid(@RequestBody Book book){
-        Book updatedbook = bookService.updateBook(book);
-        return ResponseEntity.ok(updatedbook);
+    public ResponseEntity<BookResponse> updateBookbyid(Long id,@RequestBody BookRequest book){
+        return ResponseEntity.ok(bookService.updateBook(id,book));
     }
 
     @DeleteMapping("/deletebook/{id}")
