@@ -5,9 +5,10 @@ import com.example.BookApplication.dto.BookRequest;
 import com.example.BookApplication.dto.BookResponse;
 import com.example.BookApplication.repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import javax.security.auth.login.CredentialException;
 
 //This class consists business logic
 //Controller should never talk to repository directly, service layer acts as a median
@@ -18,12 +19,15 @@ public class BookService {
     @Autowired
     BookRepository bookRepository;
 
+    public Page<BookResponse> getAllBooks(int page, int size) {
+        Pageable pageable = PageRequest.of(page,size);
+        return bookRepository.findAll(pageable)
+                .map(this::toResponse);
+    }
+
     public BookResponse addBook(Book book) {
-        Book book1 = new Book();
-        book1.setTitle(book.getTitle());
-        book1.setAuthor(book.getAuthor());
-        book1.setGenre(book1.getGenre());
-        return toResponse(book1);
+        Book save = bookRepository.save(book);
+        return toResponse(save);
     }
 
     public BookResponse getBookById(String title){
@@ -34,9 +38,11 @@ public class BookService {
 
     public BookResponse updateBook(Long id,BookRequest book){
         Book existing = bookRepository.findById(id);
+
         existing.setGenre(book.genre());
         existing.setTitle(book.title());
         existing.setAuthor(book.author());
+
         return toResponse(existing);
     }
 
