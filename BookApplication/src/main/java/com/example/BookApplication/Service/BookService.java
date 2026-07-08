@@ -8,11 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-//This class consists business logic
-//Controller should never talk to repository directly, service layer acts as a median
-//between them so that it can be tested and separable
+
 @Service
 public class BookService {
 
@@ -57,5 +56,10 @@ public class BookService {
                 book.getAuthor(),
                 book.getGenre()
         );
+    }
+
+    public Page<BookResponse> getAllBooks(Pageable pageable) {
+       Page<Book> page = bookRepository.findAll(pageable);
+       return page.map(this::toResponse);
     }
 }
