@@ -4,6 +4,7 @@ import com.example.BookApplication.Entity.Book;
 import com.example.BookApplication.Service.BookService;
 import com.example.BookApplication.dto.BookRequest;
 import com.example.BookApplication.dto.BookResponse;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -41,7 +42,7 @@ public class BookController {
     }
 
     @PostMapping("/addbook")
-    public ResponseEntity<BookResponse> addBook(@RequestBody Book book){
+    public ResponseEntity<BookResponse> addBook(@Valid  @RequestBody Book book){
         return ResponseEntity.status(HttpStatus.CREATED).body(bookService.addBook(book));
     }
 
