@@ -50,6 +50,7 @@ public class BookController {
     @GetMapping("/getbook/{bookname}")
     public ResponseEntity<BookResponse> getByBookName(@PathVariable("bookname") String title){
         return ResponseEntity.ok(bookService.getBookById(title));
+
     }
 
 
