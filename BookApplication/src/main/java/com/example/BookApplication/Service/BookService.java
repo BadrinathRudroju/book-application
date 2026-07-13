@@ -3,6 +3,7 @@ package com.example.BookApplication.Service;
 import com.example.BookApplication.Entity.Book;
 import com.example.BookApplication.dto.BookRequest;
 import com.example.BookApplication.dto.BookResponse;
+import com.example.BookApplication.exceptions.BookNotFoundException;
 import com.example.BookApplication.repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -30,7 +31,9 @@ public class BookService {
 
     public BookResponse getBookById(String title){
         Book book = bookRepository.findByTitle(title);
-        assert book != null;
+        if(book == null){
+            throw new BookNotFoundException(title);
+        }
         return toResponse(book);
     }
 
