@@ -4,6 +4,12 @@ import com.example.BookApplication.Entity.Book;
 import com.example.BookApplication.Service.BookService;
 import com.example.BookApplication.dto.BookRequest;
 import com.example.BookApplication.dto.BookResponse;
+import com.example.BookApplication.exceptions.BookNotFoundException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.json.async.NonBlockingJsonParser;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.github.fge.jsonpatch.JsonPatch;
+import com.github.fge.jsonpatch.JsonPatchException;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,13 +56,32 @@ public class BookController {
     @GetMapping("/getbook/{bookname}")
     public ResponseEntity<BookResponse> getByBookName(@PathVariable("bookname") String title){
         return ResponseEntity.ok(bookService.getBookById(title));
-
     }
 
 
     @PutMapping("/updatebook/{id}")
     public ResponseEntity<BookResponse> updateBookbyid(@PathVariable Long id,@RequestBody BookRequest book){
         return ResponseEntity.ok(bookService.updateBook(id,book));
+    }
+
+    @PatchMapping(path = "/{title}", consumes = "application/json-patch+json")
+    public ResponseEntity<BookResponse> PatchBook(@PathVariable String title, @RequestBody JsonPatch patch){
+            try{
+                BookResponse bookResponse = bookService.getBookById(title);
+                BookResponse bookResponsePatched = applyPatchToBooks(patch, bookResponse);
+                bookService.updateBook(bookResponsePatched);
+                return ResponseEntity.ok(bookResponsePatched);
+            }catch(JsonPatchException | JsonProcessingException e){
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            }catch(BookNotFoundException e){
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+    }
+
+    private BookResponse applyPatchToBooks(JsonPatch patch, BookResponse bookResponse)
+       throws JsonPatchException, JsonProcessingException{
+        JsonNode patched = patch.apply(objectMapper.convertValue(bookResponse, JsonNode.class));
+        return objectMapper.treeToValue(patched, BookResponse.class);
     }
 
     @DeleteMapping("/deletebook/{id}")
