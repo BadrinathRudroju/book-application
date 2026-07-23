@@ -64,4 +64,7 @@ public class BookService {
        Page<Book> page = bookRepository.findAll(pageable);
        return page.map(this::toResponse);
     }
+
+    public void updateBook(BookResponse bookResponsePatched) {
+    }
 }
