@@ -6,7 +6,6 @@ import com.example.BookApplication.dto.BookRequest;
 import com.example.BookApplication.dto.BookResponse;
 import com.example.BookApplication.exceptions.BookNotFoundException;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.json.async.NonBlockingJsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
@@ -55,7 +54,7 @@ public class BookController {
 
     @GetMapping("/getbook/{bookname}")
     public ResponseEntity<BookResponse> getByBookName(@PathVariable("bookname") String title){
-        return ResponseEntity.ok(bookService.getBookById(title));
+        return ResponseEntity.ok(bookService.getBookByTitle(title));
     }
 
 
@@ -67,7 +66,7 @@ public class BookController {
     @PatchMapping(path = "/{title}", consumes = "application/json-patch+json")
     public ResponseEntity<BookResponse> PatchBook(@PathVariable String title, @RequestBody JsonPatch patch){
             try{
-                BookResponse bookResponse = bookService.getBookById(title);
+                BookResponse bookResponse = bookService.getBookByTitle(title);
                 BookResponse bookResponsePatched = applyPatchToBooks(patch, bookResponse);
                 bookService.updateBook(bookResponsePatched);
                 return ResponseEntity.ok(bookResponsePatched);
