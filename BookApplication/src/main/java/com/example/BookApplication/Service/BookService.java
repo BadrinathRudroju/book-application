@@ -29,7 +29,7 @@ public class BookService {
         return toResponse(save);
     }
 
-    public BookResponse getBookById(String title){
+    public BookResponse getBookByTitle(String title){
         Book book = bookRepository.findByTitle(title);
         if(book == null){
             throw new BookNotFoundException(title);
@@ -66,5 +66,6 @@ public class BookService {
     }
 
     public void updateBook(BookResponse bookResponsePatched) {
+
     }
 }
