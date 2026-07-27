@@ -19,7 +19,7 @@ public class BookService {
     BookRepository bookRepository;
 
     public Page<BookResponse> getAllBooks(int page, int size) {
-        Pageable pageable = PageRequest.of(page,size);
+        Pageable pageable = PageRequest.of(page, size);
         return bookRepository.findAll(pageable)
                 .map(this::toResponse);
     }
@@ -29,29 +29,33 @@ public class BookService {
         return toResponse(save);
     }
 
-    public BookResponse getBookByTitle(String title){
+    public BookResponse getBookByTitle(String title) {
         Book book = bookRepository.findByTitle(title);
-        if(book == null){
+        if (book == null) {
             throw new BookNotFoundException(title);
         }
         return toResponse(book);
     }
 
-    public BookResponse updateBook(Long id,BookRequest book){
+    public BookResponse updateBook(Long id, BookRequest book) {
         Book existing = bookRepository.findById(id);
 
+        if(existing == null){
+            throw new BookNotFoundException("book not found with id: " + id);
+        }
         existing.setGenre(book.genre());
         existing.setTitle(book.title());
         existing.setAuthor(book.author());
 
-        return toResponse(existing);
+        Book savedBook = bookRepository.save(existing);
+        return toResponse(savedBook);
     }
 
-    public void deleteBook(Integer id){
+    public void deleteBook(Integer id) {
         bookRepository.deleteById(id);
     }
 
-    public BookResponse toResponse(Book book){
+    public BookResponse toResponse(Book book) {
         return new BookResponse(
                 book.getId(),
                 book.getTitle(),
@@ -61,11 +65,7 @@ public class BookService {
     }
 
     public Page<BookResponse> getAllBooks(Pageable pageable) {
-       Page<Book> page = bookRepository.findAll(pageable);
-       return page.map(this::toResponse);
-    }
-
-    public void updateBook(BookResponse bookResponsePatched) {
-
+        Page<Book> page = bookRepository.findAll(pageable);
+        return page.map(this::toResponse);
     }
 }

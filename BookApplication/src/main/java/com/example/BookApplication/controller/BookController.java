@@ -7,6 +7,7 @@ import com.example.BookApplication.dto.BookResponse;
 import com.example.BookApplication.exceptions.BookNotFoundException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
 import jakarta.validation.Valid;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 public class BookController {
 
     private final BookService bookService;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
 
     @Autowired
@@ -67,9 +69,18 @@ public class BookController {
     public ResponseEntity<BookResponse> PatchBook(@PathVariable String title, @RequestBody JsonPatch patch){
             try{
                 BookResponse bookResponse = bookService.getBookByTitle(title);
+
                 BookResponse bookResponsePatched = applyPatchToBooks(patch, bookResponse);
-                bookService.updateBook(bookResponsePatched);
-                return ResponseEntity.ok(bookResponsePatched);
+
+                BookRequest requestDto = new BookRequest(
+                        bookResponsePatched.title(),
+                        bookResponsePatched.author(),
+                        bookResponsePatched.genre()
+                );
+
+                BookResponse updatedBook = bookService.updateBook(bookResponsePatched.id(), requestDto);
+
+                return ResponseEntity.ok(updatedBook);
             }catch(JsonPatchException | JsonProcessingException e){
                     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
             }catch(BookNotFoundException e){
